@@ -1,5 +1,5 @@
-﻿# Illuminate - Reveal summoner names in champ select.
-# v1.0.0 - 29/04/2023
+# Illuminate - Reveal summoner names in champ select.
+# v1.0.0 - 30/04/2023
 
 Function ClientStatus {
 
@@ -378,8 +378,15 @@ Function GUI {
     $LabelObject = [System.Windows.Forms.Label]
     $ButtonObject = [System.Windows.Forms.Button]
     $TextBox = [System.Windows.Forms.RichTextBox]
-    $Icon = New-Object System.Drawing.Icon (".\Icon.ico")
-    
+
+    # Base64 encoded icon
+    $IconBase64 = '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'
+    $IconBytes = [Convert]::FromBase64String($IconBase64)
+
+    # Initialize a Memory stream containing the icon bytes
+    $Stream = [System.IO.MemoryStream]::new($IconBytes, 0, $IconBytes.Length)
+    $Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap]::new($Stream).GetHIcon()))
+
 
     # Form Properties
     $Form = New-Object $FormObject
@@ -485,10 +492,9 @@ Function GUI {
     # Display Form
     $Form.ShowDialog() | Out-Null
 
-    # Cleans up Form
-    $Form.Dispose()
-
-    
+    # Dispose of the stream and form when finished
+    $Form.Dispose()   
+    $Stream.Dispose()
     
 }
 
