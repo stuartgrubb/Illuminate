@@ -7,7 +7,7 @@ It contains a small GUI that displays summoner names and includes prepopulated l
 ![image](https://i.imgur.com/yDjRQsa.png)
 
 ## Installation
-An executable is available for download in the [Releases]() section.
+An executable is available for download in the [Releases](https://github.com/stuartgrubb/Illuminate/releases) section.
 
 ## How can I run or compile it myself?
 Simply copy and paste the code within Illuminate.ps1 and run in it in PowerShell.
