@@ -12,7 +12,7 @@ An executable is available for download in the [Releases](https://github.com/stu
 ## How can I run or compile it myself?
 Simply copy and paste the code within Illuminate.ps1 and run in it in PowerShell.
 
-Alternatively, this script can be converted into an executable using a module such as [ps2exe](https://www.powershellgallery.com/packages/ps2exe/1.0.12) and running the ‘Invoke-ps2exe’ command that is commented at the end of the script.
+Alternatively, this script can be converted into an executable using a module such as [ps2exe](https://www.powershellgallery.com/packages/ps2exe/) and running the ‘Invoke-ps2exe’ command that is commented at the end of the script.
 
 ## Disclaimer
 Illuminate is not endorsed by or affiliated in any way with Riot Games. Use at your own risk.
