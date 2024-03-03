@@ -1,5 +1,5 @@
 # Illuminate - Reveal summoner names in champ select.
-# v1.0.0 - 30/04/2023
+# v1.0.1 - 03/03/2024
 
 Function ClientStatus {
 
@@ -143,7 +143,9 @@ Function GetSummonerNames {
     # Reset GameFlowPhase and Summoner Names
     Clear-Variable -Name GameFlowPhase -Scope Script
     $Names = New-Object System.Collections.ArrayList
+    $Names_Tags = New-Object System.Collections.ArrayList
     $Script:SummonerNames = New-Object System.Collections.ArrayList
+    $Script:RiotIDs = New-Object System.Collections.ArrayList
 
     # Get Current Gameflow-Phase
     $Script:GameFlowPhase = Invoke-RestMethod -Uri "https://127.0.0.1:$ClientPort/lol-gameflow/v1/gameflow-phase" -Headers $ClientHeaders
@@ -156,15 +158,15 @@ Function GetSummonerNames {
         IF ($GameFlowPhase -match 'ChampSelect') {
 
             # Query Summoner Names
-            $Participants = Invoke-RestMethod -Uri "https://127.0.0.1:$RiotPort/chat/v5/participants/champ-select" -Headers $RiotHeaders
-            $Participants = $Participants.Participants.Name
+            $Participants = Invoke-RestMethod -Uri "https://127.0.0.1:$RiotPort/chat/v5/participants" -Headers $RiotHeaders
+           # $Participants = $Participants.Participants.Name
 
             # Convert to utf8 for special chars
-
-            ForEach ($Name in $Participants) {
-                $Bytes = [System.Text.Encoding]::GetEncoding("ISO-8859-1").GetBytes($Name)
-                $Name = [System.Text.Encoding]::UTF8.GetString($Bytes)
-                $Names.Add($Name)
+            ForEach ($Participant in $Participants.Participants) {
+                $Bytes = [System.Text.Encoding]::GetEncoding("ISO-8859-1").GetBytes($Participant.Game_Name)
+                $Participant.Game_Name = [System.Text.Encoding]::UTF8.GetString($Bytes)
+                $Names.Add($Participant.Game_Name)
+                $Names_Tags.Add($Participant.Game_Name + "-" + $Participant.Game_Tag)
             }
 
             # Format Summoner Names
@@ -183,6 +185,24 @@ Function GetSummonerNames {
             Else {
                 $SummonerNames.Add($Names)
             }
+
+            # Format RiotIDs used for URL's
+            IF ($Names_Tags.Count -gt 1) {
+
+                For ($i=0; $i -le $Names_Tags.Count; $i++) {
+                    # Add comma to each summoner name except for the last one
+                    IF ($i -lt $Names_Tags.Count -1) {
+                        $RiotIDs.Add($Names_Tags[$i] + ",")
+                    }
+                    Else {
+                        $RiotIDs.Add($Names_Tags[$i])
+                    }
+                }
+            }
+            Else {
+                $RiotIDs.Add($Names_Tags)
+            }
+
         }
         ElseIf ($GameFlowPhase -match 'InProgress') {            
             # Match is in progress - format URLs to display the 'ingame' page.
@@ -262,8 +282,10 @@ Function SiteURLs {
     TW = 'tw2';
     VN = 'vn2'}
 
+    $OPGGSummoners = $null
+    $OPGGSummoners = $SummonerNames | Out-String
     $Summoners = $null
-    $Summoners = $SummonerNames | Out-String
+    $Summoners = $RiotIDs | Out-String
 
     # OP.GG
     IF ($Site -eq '1' -and $GameFlowPhase -match 'InProgress') {
@@ -271,7 +293,7 @@ Function SiteURLs {
         Start-Process $URL
     }    
     ElseIf ($Site -eq '1') {    
-        $URL = "https://www.op.gg/multisearch/$Region`?summoners=$Summoners"
+        $URL = "https://www.op.gg/multisearch/$Region`?summoners=$OPGGSummoners"
         Start-Process $URL
     }
 
@@ -312,16 +334,18 @@ Function SiteURLs {
 
 
 
-Function DarkMode {
+Function SwitchTheme {
 
     IF ($Form.BackColor -eq '#ffffff') {
-        $Form.BackColor = '#000000'
+        $Form.BackColor = '#323232'
         $Button1.ForeColor = '#ffffff'
         $Button2.ForeColor = '#ffffff'
         $Button3.ForeColor = '#ffffff'
         $Button4.ForeColor = '#ffffff'
         $Button5.ForeColor = '#ffffff'
         $Button6.ForeColor = '#ffffff'
+        $OutputBox1.BackColor = '#323232'
+        $OutputBox1.ForeColor = '#ffffff'
         $Button3.Text = 'Light Mode'
 
         # Maintain green status color when switching between light/dark mode
@@ -342,6 +366,8 @@ Function DarkMode {
         $Button4.ForeColor = '#000000'
         $Button5.ForeColor = '#000000'
         $Button6.ForeColor = '#000000'
+        $OutputBox1.BackColor = '#ffffff'
+        $OutputBox1.ForeColor = '#000000'
         $Button3.Text = 'Dark Mode'
 
 
@@ -395,7 +421,7 @@ Function GUI {
     $Form.MaximizeBox = $false
     $Form.Icon = $Icon
     $Form.Text = 'Illuminate'
-    $Form.BackColor = '#ffffff'
+    $Form.BackColor = '#323232'
 
 
     # Button Properties
@@ -403,7 +429,7 @@ Function GUI {
     $Button1.Text = 'Get Summoners'
     $Button1.Width = '120'
     $Button1.Height = '28'
-    $Button1.ForeColor = '#000000'
+    $Button1.ForeColor = '#ffffff'
     $Button1.Font = 'Segoe UI,10,style=Bold'
     $Button1.Location = New-Object System.Drawing.Point(250,10)
 
@@ -411,15 +437,15 @@ Function GUI {
     $Button2.Text = 'Dodge'
     $Button2.Width = '120'
     $Button2.Height = '28'
-    $Button2.ForeColor = '#000000'
+    $Button2.ForeColor = '#ffffff'
     $Button2.Font = 'Segoe UI,10,style=Bold'
     $Button2.Location = New-Object System.Drawing.Point(250,160)
 
     $Button3 = New-Object $ButtonObject
-    $Button3.Text = 'Dark Mode'
+    $Button3.Text = 'Light Mode'
     $Button3.Width = '120'
     $Button3.Height = '28'
-    $Button3.ForeColor = '#000000'
+    $Button3.ForeColor = '#ffffff'
     $Button3.Font = 'Segoe UI,10,style=Bold'
     $Button3.Location = New-Object System.Drawing.Point(250,130)
 
@@ -427,7 +453,7 @@ Function GUI {
     $Button4.Text = 'OP.GG'
     $Button4.Width = '120'
     $Button4.Height = '28'
-    $Button4.ForeColor = '#000000'
+    $Button4.ForeColor = '#ffffff'
     $Button4.Font = 'Segoe UI,10,style=Bold'
     $Button4.Location = New-Object System.Drawing.Point(250,40)
 
@@ -435,7 +461,7 @@ Function GUI {
     $Button5.Text = 'U.GG'
     $Button5.Width = '120'
     $Button5.Height = '28'
-    $Button5.ForeColor = '#000000'
+    $Button5.ForeColor = '#ffffff'
     $Button5.Font = 'Segoe UI,10,style=Bold'
     $Button5.Location = New-Object System.Drawing.Point(250,70)
 
@@ -443,7 +469,7 @@ Function GUI {
     $Button6.Text = 'PORO'
     $Button6.Width = '120'
     $Button6.Height = '28'
-    $Button6.ForeColor = '#000000'
+    $Button6.ForeColor = '#ffffff'
     $Button6.Font = 'Segoe UI,10,style=Bold'
     $Button6.Location = New-Object System.Drawing.Point(250,100)
 
@@ -453,18 +479,21 @@ Function GUI {
     $Label1.Text = "Client: $ClientStatus"
     $Label1.AutoSize = $true
     $Label1.Font = 'Segoe UI,12,style=Bold'
+    $Label1.ForeColor = '#ffffff'
     $Label1.Location = New-Object System.Drawing.Point(10,8)
 
     $Label2 = New-Object $LabelObject
     $Label2.Text = "ID: $CurrSummoner"
     $Label2.AutoSize = $true
     $Label2.Font = 'Segoe UI,12,style=Bold'
+    $Label2.ForeColor = '#ffffff'
     $Label2.Location = New-Object System.Drawing.Point(10,30)
 
     $Label3 = New-Object $LabelObject
     $Label3.Text = "Status: $SummonerStatus"
     $Label3.AutoSize = $true
     $Label3.Font = 'Segoe UI,12,style=Bold'
+    $Label3.ForeColor = '#ffffff'
     $Label3.Location = New-Object System.Drawing.Point(10,52)
 
 
@@ -474,13 +503,15 @@ Function GUI {
     $OutputBox1.height = '110'
     $OutputBox1.Margin = 0
     $OutputBox1.Font = 'Segoe UI,11'
+    $OutputBox1.BackColor = '#323232'
+    $OutputBox1.ForeColor = '#ffffff'
     $OutputBox1.Location = New-Object System.Drawing.Point(10,80)
 
 
     # Button Functions
     $Button1.Add_Click({ClientStatus})
     $Button2.Add_Click({Dodge})
-    $Button3.Add_Click({DarkMode})
+    $Button3.Add_Click({SwitchTheme})
     $Button4.Add_Click({$Site = '1'; SiteURLs})
     $Button5.Add_Click({$Site = '2'; SiteURLs})
     $Button6.Add_Click({$Site = '3'; SiteURLS})
@@ -506,4 +537,4 @@ GUI
 
 
 # Convert to exe 
-#Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico -version '1.0.0'
+#Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico -version '1.0.1'
