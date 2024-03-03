@@ -4,7 +4,7 @@ Illuminate is a PowerShell script that queries the LCU API to reveal your team's
 It contains a small GUI that displays summoner names and includes prepopulated links for OP.GG, U.GG, and Porofessor. No need to copy and paste!
 
 ## Preview
-![image](https://i.imgur.com/yDjRQsa.png)
+![GitHub Image](/Preview.png)
 
 ## Installation
 An executable is available for download in the [Releases](https://github.com/stuartgrubb/Illuminate/releases) section.
