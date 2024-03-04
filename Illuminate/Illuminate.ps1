@@ -1,5 +1,5 @@
 # Illuminate - Reveal summoner names in champ select.
-# v1.0.1 - 03/03/2024
+# v1.0.2 - 04/03/2024
 
 Function ClientStatus {
 
@@ -144,8 +144,11 @@ Function GetSummonerNames {
     Clear-Variable -Name GameFlowPhase -Scope Script
     $Names = New-Object System.Collections.ArrayList
     $Names_Tags = New-Object System.Collections.ArrayList
+    $Names_Hash_Tags = New-Object System.Collections.ArrayList
     $Script:SummonerNames = New-Object System.Collections.ArrayList
+    $Script:OPGGNames = New-Object System.Collections.ArrayList
     $Script:RiotIDs = New-Object System.Collections.ArrayList
+    
 
     # Get Current Gameflow-Phase
     $Script:GameFlowPhase = Invoke-RestMethod -Uri "https://127.0.0.1:$ClientPort/lol-gameflow/v1/gameflow-phase" -Headers $ClientHeaders
@@ -165,8 +168,9 @@ Function GetSummonerNames {
             ForEach ($Participant in $Participants.Participants) {
                 $Bytes = [System.Text.Encoding]::GetEncoding("ISO-8859-1").GetBytes($Participant.Game_Name)
                 $Participant.Game_Name = [System.Text.Encoding]::UTF8.GetString($Bytes)
-                $Names.Add($Participant.Game_Name)
-                $Names_Tags.Add($Participant.Game_Name + "-" + $Participant.Game_Tag)
+                $Names.Add($Participant.Game_Name) # Listbox names
+                $Names_Tags.Add($Participant.Game_Name + "-" + $Participant.Game_Tag) # U.GG\Porofessor URLs
+                $Names_Hash_Tags.Add($Participant.Game_Name + "%23" + $Participant.Game_Tag) # OPGG URLs
             }
 
             # Format Summoner Names
@@ -186,7 +190,7 @@ Function GetSummonerNames {
                 $SummonerNames.Add($Names)
             }
 
-            # Format RiotIDs used for URL's
+            # Format RiotIDs used for U.GG and Porofessor
             IF ($Names_Tags.Count -gt 1) {
 
                 For ($i=0; $i -le $Names_Tags.Count; $i++) {
@@ -202,6 +206,25 @@ Function GetSummonerNames {
             Else {
                 $RiotIDs.Add($Names_Tags)
             }
+            
+            # Format RiotIDs for OPGG
+            IF ($Names_Hash_Tags.Count -gt 1) {
+
+                For ($i=0; $i -le $Names_Hash_Tags.Count; $i++) {
+                    # Add comma to each summoner name except for the last one
+                    IF ($i -lt $Names_Hash_Tags.Count -1) {
+                        $OPGGNames.Add($Names_Hash_Tags[$i] + ",")
+                    }
+                    Else {
+                        $OPGGNames.Add($Names_Hash_Tags[$i])
+                    }
+                }
+            }
+            Else {
+                $OPGGNames.Add($Names_Hash_Tags)
+            }
+
+
 
         }
         ElseIf ($GameFlowPhase -match 'InProgress') {            
@@ -283,7 +306,7 @@ Function SiteURLs {
     VN = 'vn2'}
 
     $OPGGSummoners = $null
-    $OPGGSummoners = $SummonerNames | Out-String
+    $OPGGSummoners = $OPGGNames | Out-String
     $Summoners = $null
     $Summoners = $RiotIDs | Out-String
 
@@ -537,4 +560,4 @@ GUI
 
 
 # Convert to exe 
-#Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico -version '1.0.1'
+#Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico -version '1.0.2'
