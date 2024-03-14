@@ -1,5 +1,5 @@
 # Illuminate - Reveal summoner names in champ select.
-# v1.0.2 - 04/03/2024
+# v1.0.3 - 14/03/2024
 
 Function ClientStatus {
 
@@ -162,15 +162,19 @@ Function GetSummonerNames {
 
             # Query Summoner Names
             $Participants = Invoke-RestMethod -Uri "https://127.0.0.1:$RiotPort/chat/v5/participants" -Headers $RiotHeaders
-           # $Participants = $Participants.Participants.Name
 
             # Convert to utf8 for special chars
             ForEach ($Participant in $Participants.Participants) {
-                $Bytes = [System.Text.Encoding]::GetEncoding("ISO-8859-1").GetBytes($Participant.Game_Name)
-                $Participant.Game_Name = [System.Text.Encoding]::UTF8.GetString($Bytes)
-                $Names.Add($Participant.Game_Name) # Listbox names
-                $Names_Tags.Add($Participant.Game_Name + "-" + $Participant.Game_Tag) # U.GG\Porofessor URLs
-                $Names_Hash_Tags.Add($Participant.Game_Name + "%23" + $Participant.Game_Tag) # OPGG URLs
+
+                # Exclude direct message participants by ensuring activePlatform is not empty.
+                If ($Participant.activePlatform -ne $null) {
+                
+                    $Bytes = [System.Text.Encoding]::GetEncoding("ISO-8859-1").GetBytes($Participant.Game_Name)
+                    $Participant.Game_Name = [System.Text.Encoding]::UTF8.GetString($Bytes)
+                    $Names.Add($Participant.Game_Name) # Listbox names
+                    $Names_Tags.Add($Participant.Game_Name + "-" + $Participant.Game_Tag) # U.GG\Porofessor URLs
+                    $Names_Hash_Tags.Add($Participant.Game_Name + "%23" + $Participant.Game_Tag) # OPGG URLs
+                }
             }
 
             # Format Summoner Names
@@ -560,4 +564,4 @@ GUI
 
 
 # Convert to exe 
-#Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico -version '1.0.2'
+#Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico -version '1.0.3'
