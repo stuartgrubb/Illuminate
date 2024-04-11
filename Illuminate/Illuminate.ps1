@@ -1,5 +1,5 @@
 # Illuminate - Reveal summoner names in champ select.
-# v1.0.5 - 09/04/2024
+# v1.0.6 - 11/04/2024
 
 Function ClientStatus {
 
@@ -160,9 +160,9 @@ Function GetSummonerNames {
     
         IF ($GameFlowPhase -match 'ChampSelect') {
 
-            # Query Summoner Names
-            $Participants = Invoke-RestMethod -Uri "https://127.0.0.1:$RiotPort/chat/v5/participants" -Headers $RiotHeaders
-            $Participants = $Participants.Participants | Where-Object {$_.activePlatform -ne $null} | Sort-Object puuid -Unique # Remove direct message participants and also duplicates if found.
+            # Query Summoner Names (Exclude direct message participants)
+            $Participants = Invoke-RestMethod -Uri "https://127.0.0.1:$RiotPort/chat/v5/participants" -Headers $RiotHeaders | Select -ExpandProperty participants | Where-Object {$_.activePlatform -ne $null}
+            $Participants = $Participants | Sort-Object puuid -Unique # Remove any duplicate participants.
 
             # Convert to utf8 for special chars
             ForEach ($Participant in $Participants) {
@@ -547,11 +547,4 @@ Function GUI {
 }
 
 
-
-
 GUI
-
-
-
-# Convert to exe 
-#Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico -version '1.0.5'
