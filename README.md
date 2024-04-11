@@ -14,19 +14,14 @@ You can also copy and paste the code within Illuminate.ps1 and simply run in it 
 ## How can I compile it myself?
 This script can be converted into an executable through the following steps.
 
-1. Download [Illuminate.ps1](https://github.com/stuartgrubb/Illuminate/tree/main/Illuminate)
+1. Download a copy of the source code from [Releases](https://github.com/stuartgrubb/Illuminate/releases).
 
-2. Run the command below to install the [ps2exe](https://www.powershellgallery.com/packages/ps2exe/) module.
+2. Run the command below in PowerShell to install the [ps2exe](https://www.powershellgallery.com/packages/ps2exe/) module.
 ```PowerShell
 Install-Module -Name ps2exe
 ```
 
 3. Convert the script into an executable by running the 'Invoke-ps2exe' command below.
-```PowerShell
-Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole
-```
-
-4. (Optional) Download the icon file [Icon.ico](https://github.com/stuartgrubb/Illuminate/tree/main/Illuminate) and run the command below to include it in the compiled executable.
 ```PowerShell
 Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico
 ```
