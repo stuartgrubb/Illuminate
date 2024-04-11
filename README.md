@@ -9,10 +9,27 @@ It contains a small GUI that displays summoner names and includes prepopulated l
 ## Where can I download Illuminate?
 An executable is available for download in the [Releases](https://github.com/stuartgrubb/Illuminate/releases) section.
 
-You can also copy and paste the code within Illuminate.ps1 and run in it in PowerShell.
+You can also copy and paste the code within Illuminate.ps1 and simply run in it in PowerShell.
 
 ## How can I compile it myself?
-This script can be converted into an executable using a module such as [ps2exe](https://www.powershellgallery.com/packages/ps2exe/) and running the ‘Invoke-ps2exe’ command that is commented at the end of the script.
+This script can be converted into an executable through the following steps.
+
+1. Download [Illuminate.ps1](https://github.com/stuartgrubb/Illuminate/tree/main/Illuminate)
+
+2. Run the command below to install the [ps2exe](https://www.powershellgallery.com/packages/ps2exe/) module.
+```PowerShell
+Install-Module -Name ps2exe
+```
+
+3. Convert the script into an executable by running the 'Invoke-ps2exe' command below.
+```PowerShell
+Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole
+```
+
+4. (Optional) Download the icon file [Icon.ico](https://github.com/stuartgrubb/Illuminate/tree/main/Illuminate) and run the command below to include it in the compiled executable.
+```PowerShell
+Invoke-ps2exe .\Illuminate.ps1 .\Illuminate.exe -NoConsole -iconFile .\Icon.ico
+```
 
 ## Disclaimer
 Illuminate is not endorsed by or affiliated in any way with Riot Games. Use at your own risk.
