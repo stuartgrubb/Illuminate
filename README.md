@@ -1,4 +1,10 @@
 # ![image](https://i.imgur.com/chXMyEu.png) Illuminate
+
+## Warning
+Following the implementation of Vanguard, Riot Games are now suspending players using third-party lobby revealers. See [Tweet](https://x.com/RiotK3o/status/1792706933952311352).
+
+
+## About
 Illuminate is a PowerShell script that queries the LCU API to reveal your team's summoner names in champ select.
 
 It contains a small GUI that displays summoner names and includes prepopulated links for OP.GG, U.GG, and Porofessor. No need to copy and paste!
